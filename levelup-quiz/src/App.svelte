@@ -22,9 +22,14 @@
       max-width: none;
     }
   }
+
+  :global(h4) {
+    color: green;
+  }
 </style>
 
 <main>
   <h1>Hello World!</h1>
-  <Quiz quizName="New Quiz" />
+  <h4>I'm an h4!</h4>
+  <Quiz />
 </main>
