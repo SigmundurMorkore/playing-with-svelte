@@ -1,16 +1,10 @@
 <script>
-  let result;
-  let correctAnswer = "b";
-  let answers = ["a", "b", "c", "d"];
-  let quiz = getQuiz();
+  import { fade, blur, fly, slide, scale } from "svelte/transition";
+  import Question from "./Question.svelte";
 
-  function pickAnswer(answer) {
-    if (answer === correctAnswer) {
-      return (result = "Correct");
-    } else {
-      result = "Incorrect";
-    }
-  }
+  let activeQuestion = 0;
+  let score = 0;
+  let quiz = getQuiz();
 
   async function getQuiz() {
     const res = await fetch(
@@ -21,35 +15,44 @@
     return quiz;
   }
 
-  function handleClick() {
+  function nextQuestion() {
+    activeQuestion = activeQuestion + 1;
+  }
+
+  function resetQuiz() {
+    score = 0;
+    activeQuestion = 0;
     quiz = getQuiz();
+  }
+
+  function addToScore() {
+    score = score + 1;
   }
 </script>
 
 <style>
-  h4 {
-    color: red;
+  .fade-wrapper {
+    position: absolute;
   }
 </style>
 
 <div>
-  <button on:click={handleClick}>Get Questions</button>
+  <button on:click={resetQuiz}>Start New Quiz</button>
 
-  {#if result}
-    <h4>{result}</h4>
-  {:else}
-    <h5>Please pick an answer</h5>
-  {/if}
+  <h3>My Score: {score}</h3>
+  <h4>Question #{activeQuestion + 1}</h4>
 
   {#await quiz}
     Loading...
   {:then data}
-    <h3>{data.results[0].question}</h3>
-  {/await}
 
-  {#each answers as answer}
-    <button on:click={() => pickAnswer(answer)}>
-      Answer {answer.toUpperCase()}
-    </button>
-  {/each}
+    {#each data.results as question, index}
+      {#if index === activeQuestion}
+        <div in:fly={{ x: 100 }} out:fly={{ xH: -200 }} class="fade-wrapper">
+          <Question {question} {nextQuestion} {addToScore} />
+        </div>
+      {/if}
+    {/each}
+
+  {/await}
 </div>
