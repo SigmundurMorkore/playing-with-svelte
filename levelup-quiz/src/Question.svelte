@@ -1,7 +1,8 @@
 <script>
+  import { score } from "./store.js";
+
   export let question;
   export let nextQuestion;
-  export let addToScore;
 
   let isCorrect;
   let isAnswered = false;
@@ -32,18 +33,32 @@
       isAnswered = true;
       isCorrect = correct;
       if (correct) {
-        addToScore();
+        score.update(val => val + 1);
       }
     }
   }
 </script>
+
+<style>
+  h5.wrong {
+    color: red;
+  }
+
+  h5.isCorrect {
+    color: green;
+  }
+
+  .answer {
+    display: block;
+  }
+</style>
 
 <h3>
   {@html question.question}
 </h3>
 
 {#if isAnswered}
-  <h5>
+  <h5 class:isCorrect class:wrong={!isCorrect}>
     {#if isCorrect}
       You got it right
     {:else}You goofed up. The correct answer was: {question.correct_answer}{/if}
@@ -51,7 +66,10 @@
 {/if}
 
 {#each allAnswers as answer}
-  <button on:click={() => checkQuestion(answer.correct)}>
+  <button
+    class="answer"
+    disabled={isAnswered}
+    on:click={() => checkQuestion(answer.correct)}>
     {@html answer.answer}
   </button>
 {/each}
