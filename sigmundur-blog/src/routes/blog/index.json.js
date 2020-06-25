@@ -1,18 +1,24 @@
-import posts from './_posts.js'
+import fs from 'fs'
+import path from 'path'
 
-const contents = JSON.stringify(
-  posts.map((post) => {
-    return {
-      title: post.title,
-      slug: post.slug,
-    }
-  }),
-)
+import marked from 'marked'
+
+function getAllPosts(filesPath) {
+  const data = fs.readdirSync(filesPath).map((fileName) => {
+    const post = fs.readFileSync(path.resolve(filesPath, fileName), 'utf-8')
+    const renderer = new marked.Renderer()
+    const html = marked(post, { renderer })
+    return { title: 'A new post', slug: 'a-new-post', html }
+  })
+  return data
+}
 
 export function get(req, res) {
+  const posts = getAllPosts('src/posts')
+
   res.writeHead(200, {
     'Content-Type': 'application/json',
   })
 
-  res.end(contents)
+  res.end(JSON.stringify(posts))
 }
