@@ -7,6 +7,8 @@
 </script>
 
 <script>
+  import { fadeIn, fadeOut } from "../../animate";
+
   export let posts;
 </script>
 
@@ -21,19 +23,18 @@
   <title>Blog</title>
 </svelte:head>
 
-<h1>Recent posts</h1>
+<div in:fadeIn out:fadeOut>
+  <h1>Recent posts</h1>
 
-<ul>
-  {#each posts as post}
-    <!-- we're using the non-standard `rel=prefetch` attribute to
+  <ul>
+    {#each posts as post}
+      <!-- we're using the non-standard `rel=prefetch` attribute to
 				tell Sapper to load the data for the page as soon as
 				the user hovers over the link or taps it, instead of
 				waiting for the 'click' event -->
-    <li>
-      <a rel="prefetch" href="blog/{post.slug}">{post.title}</a>
-      <div>
-        {@html post.html}
-      </div>
-    </li>
-  {/each}
-</ul>
+      <li>
+        <a rel="prefetch" href="blog/{post.slug}">{post.title} - {post.date}</a>
+      </li>
+    {/each}
+  </ul>
+</div>

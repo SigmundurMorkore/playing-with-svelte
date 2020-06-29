@@ -2,40 +2,26 @@ import fs from 'fs'
 import path from 'path'
 
 import marked from 'marked'
-
-/* const lookup = new Map()
-posts.forEach((post) => {
-  lookup.set(post.slug, JSON.stringify(post))
-}) */
+import grayMatter from 'gray-matter'
 
 export function get(req, res, next) {
   // the `slug` parameter is available because
   // this file is called [slug].json.js
   const { slug } = req.params
 
-  /* if (lookup.has(slug)) { */
   res.writeHead(200, {
     'Content-Type': 'application/json',
   })
 
-  const post = fs.readFileSync(
-    path.resolve('src/posts', 'first-post.md'),
-    'utf-8',
-  )
+  // Reading correct file
+  const post = fs.readFileSync(path.resolve('src/posts', `${slug}.md`), 'utf-8')
+
+  // Parse frontmatter
+  const { data, content } = grayMatter(post)
+
+  // Render html from string
   const renderer = new marked.Renderer()
-  const html = marked(post, { renderer })
-  const data = { title: 'A new post', slug: 'a-new-post', html }
+  const html = marked(content, { renderer })
 
-  res.end(JSON.stringify(data))
-
-  /*     } else {
-    res.writeHead(404, {
-      'Content-Type': 'application/json',
-    }) 
-
-    res.end(
-    JSON.stringify({
-      message: `Not found`,
-    }),
-  ) */
+  res.end(JSON.stringify({ html, ...data }))
 }
